@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "types": ["node"],
+
+    "target": "es2022",
+    "module": "nodenext",
+
+    "experimentalDecorators": true,
+  },
+
+  "include": ["src/**/*.ts"]
+}

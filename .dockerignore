@@ -1,0 +1,11 @@
+# Directories
+.git/
+dist/
+node_modules/
+
+# Files
+.env
+.env.sample
+.gitattributes
+.gitignore
+README.md
