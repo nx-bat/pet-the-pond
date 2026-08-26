@@ -1,4 +1,4 @@
-import { CommandClient, Event } from "athena-prime";
+import { CommandClient, Event } from 'athena-prime';
 
 // ----------
 
@@ -7,7 +7,7 @@ class ReadyEvent extends Event<CommandClient> {
 
   async handle(context: CommandClient<any, any>) {
     await context.deployCommands();
-    context.setCustomActivity("Petting the Pond!");
+    context.setCustomActivity('Petting the Pond!');
   }
 }
 

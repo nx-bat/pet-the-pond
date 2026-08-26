@@ -1,5 +1,5 @@
-import { Command, CommandBuilder, CommandClient, CommandInteraction, Constants, SlashCommand } from "athena-prime";
-import { getUser, updateUserSettings } from "../../utils";
+import { Command, CommandBuilder, CommandClient, CommandInteraction, Constants, SlashCommand } from 'athena-prime';
+import { updateUserSettings } from '../../utils';
 
 // ----------
 
@@ -7,7 +7,7 @@ import { getUser, updateUserSettings } from "../../utils";
   new CommandBuilder('optout', 'Stop counting your pet interactions.')
     .setIntegrationTypes(Constants.ApplicationIntegrationType.GuildInstall)
     .setContexts(Constants.InteractionContextType.Guild)
-    .setCommandType(Constants.ApplicationCommandType.ChatInput)
+    .setCommandType(Constants.ApplicationCommandType.ChatInput),
 )
 class OptOutCommand extends Command<CommandClient> {
   cooldown = 5;
@@ -18,7 +18,7 @@ class OptOutCommand extends Command<CommandClient> {
     await updateUserSettings(interaction.user.id, { participating: false });
 
     await interaction.createMessage({
-      content: "Successfully opted out. You won't receive any points for petting :<"
+      content: "Successfully opted out. You won't receive any points for petting :<",
     });
   }
 }

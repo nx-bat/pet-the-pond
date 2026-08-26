@@ -19,4 +19,4 @@ export type User = {
    * User statistics.
    */
   statistics: UserStatistics;
-}
+};

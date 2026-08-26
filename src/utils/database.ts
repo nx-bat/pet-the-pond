@@ -1,20 +1,16 @@
-import postgres from "postgres";
-import { User } from "../types";
+import postgres from 'postgres';
+import { User } from '../types';
 
 const client = postgres(process.env.DATABASE_URL);
 
 const getDefaultUser = (userId: string): User => ({
-  flags: {
-    blacklisted: false
-  },
-
   settings: {
     participating: true,
   },
 
   statistics: {
-    pets: 0
-  }
+    pets: 0,
+  },
 });
 
 export async function getUser(userId: string): Promise<User> {
@@ -50,7 +46,7 @@ export async function deleteUser(userId: string): Promise<void> {
   `;
 }
 
-export async function updateUserSettings(userId: string, settings: Partial<User["settings"]>): Promise<void> {
+export async function updateUserSettings(userId: string, settings: Partial<User['settings']>): Promise<void> {
   await client`
     UPDATE users
     SET data = jsonb_set(
@@ -62,7 +58,7 @@ export async function updateUserSettings(userId: string, settings: Partial<User[
   `;
 }
 
-export async function updateUserStatistics(userId: string, statistics: Partial<User["statistics"]>): Promise<void> {
+export async function updateUserStatistics(userId: string, statistics: Partial<User['statistics']>): Promise<void> {
   await client`
     UPDATE users
     SET data = jsonb_set(
@@ -76,7 +72,7 @@ export async function updateUserStatistics(userId: string, statistics: Partial<U
 
 //#region Leaderboard
 
-export async function getHighestPets(limit = 10): Promise<{ userId: string, pets: number }[]> {
+export async function getHighestPets(limit = 10): Promise<{ userId: string; pets: number }[]> {
   const users = await client<{ user_id: string; pets: number }[]>`
     SELECT user_id, (data->'statistics'->>'pets')::integer AS pets
     FROM users
@@ -87,9 +83,9 @@ export async function getHighestPets(limit = 10): Promise<{ userId: string, pets
     LIMIT ${limit}
   `;
 
-  return users.map(user => ({
+  return users.map((user) => ({
     userId: user.user_id,
-    pets: user.pets
+    pets: user.pets,
   }));
 }
 

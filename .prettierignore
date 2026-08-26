@@ -1,0 +1,12 @@
+# Directories
+dist/
+node_modules/
+
+# Files
+.dockerignore
+.env
+.env.sample
+.gitattributes
+.gitignore
+.npmrc
+Dockerfile

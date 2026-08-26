@@ -1,5 +1,5 @@
-import { Command, CommandBuilder, CommandClient, CommandInteraction, Constants, SlashCommand } from "athena-prime";
-import config from "../../config";
+import { Command, CommandBuilder, CommandClient, CommandInteraction, Constants, SlashCommand } from 'athena-prime';
+import config from '../../config';
 
 // ----------
 
@@ -8,12 +8,12 @@ import config from "../../config";
     .setIntegrationTypes(Constants.ApplicationIntegrationType.GuildInstall)
     .setContexts(Constants.InteractionContextType.Guild)
     .setCommandType(Constants.ApplicationCommandType.ChatInput)
-    .setMemberPermission(Constants.PermissionFlagsBits.Administrator)
+    .setMemberPermission(Constants.PermissionFlagsBits.Administrator),
 )
 class InitCommand extends Command<CommandClient> {
   users = [
     '1363132678022631428', // nxbat
-    '454653142500507649' // bitdash
+    '454653142500507649', // bitdash
   ];
 
   async #createInformationMessage(context: CommandClient<any, any>, interaction: CommandInteraction) {
@@ -37,9 +37,9 @@ class InitCommand extends Command<CommandClient> {
 
         footer: {
           text: `Made by nxbat @ Archwing`,
-          icon_url: 'https://femboytrain.ing/nxbat-archwing'
-        }
-      }
+          icon_url: 'https://femboytrain.ing/nxbat-archwing',
+        },
+      },
     });
   }
 

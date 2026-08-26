@@ -13,7 +13,7 @@ const client: CommandClient = new CommandClient({
     intents: [
       Constants.GatewayIntentBits.Guilds,
       Constants.GatewayIntentBits.GuildMessages,
-      Constants.GatewayIntentBits.GuildMessageReactions
+      Constants.GatewayIntentBits.GuildMessageReactions,
     ],
 
     largeBotOptimizations: true,
@@ -22,13 +22,13 @@ const client: CommandClient = new CommandClient({
       users: () => new NullCollection(User),
       members: () => new NullCollection(Member),
       messages: () => new NullCollection(Message),
-      guilds: () => new NullCollection(Guild)
+      guilds: () => new NullCollection(Guild),
     },
   },
 });
 
-commands.forEach(command => client.registerCommand(command, true));
-events.forEach(event => client.registerEvent(event, true));
+commands.forEach((command) => client.registerCommand(command, true));
+events.forEach((event) => client.registerEvent(event, true));
 
 // ----------
 

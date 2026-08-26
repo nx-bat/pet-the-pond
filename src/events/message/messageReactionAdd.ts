@@ -1,6 +1,6 @@
-import { CommandClient, Constants, Event, Member, Message } from "athena-prime";
+import { CommandClient, Constants, Event, Member, Message } from 'athena-prime';
 import config from '../../config';
-import { getUser, updateUserStatistics } from "../../utils";
+import { getUser, updateUserStatistics } from '../../utils';
 
 // ----------
 
@@ -12,9 +12,8 @@ class MessageReactionAddEvent extends Event<CommandClient> {
     if (msg.author.id !== config.identifiers.targetId || emoji.id !== config.identifiers.emojiId) return;
 
     const _user = await getUser(member.id);
-    if (_user.flags.blacklisted || !_user.settings.participating) return;
+    if (!_user.settings.participating) return;
 
-    // Update Statistics.
     await updateUserStatistics(member.id, { pets: _user.statistics.pets + 1 });
   }
 }

@@ -1,5 +1,5 @@
-import { Command, CommandBuilder, CommandClient, CommandInteraction, Constants, SlashCommand } from "athena-prime";
-import { getUser, updateUserSettings } from "../../utils";
+import { Command, CommandBuilder, CommandClient, CommandInteraction, Constants, SlashCommand } from 'athena-prime';
+import { updateUserSettings } from '../../utils';
 
 // ----------
 
@@ -7,7 +7,7 @@ import { getUser, updateUserSettings } from "../../utils";
   new CommandBuilder('optin', 'Stop counting your pet interactions.')
     .setIntegrationTypes(Constants.ApplicationIntegrationType.GuildInstall)
     .setContexts(Constants.InteractionContextType.Guild)
-    .setCommandType(Constants.ApplicationCommandType.ChatInput)
+    .setCommandType(Constants.ApplicationCommandType.ChatInput),
 )
 class OptInCommand extends Command<CommandClient> {
   cooldown = 5;
