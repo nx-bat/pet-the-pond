@@ -1,6 +1,7 @@
 import 'dotenv/config';
 
 import { CommandClient, Constants, Guild, Member, Message, NullCollection, User } from 'athena-prime';
+import commands from './commands';
 import events from './events';
 
 // ----------
@@ -27,6 +28,7 @@ const client: CommandClient = new CommandClient({
   },
 });
 
+commands.forEach(command => client.registerCommand(command));
 events.forEach(event => client.registerEvent(event));
 
 // ----------

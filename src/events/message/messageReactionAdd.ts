@@ -1,7 +1,8 @@
 import { CommandClient, Constants, Event, Member, Message } from "athena-prime";
 import config from '../../config';
+import { getUser, setUserXp } from "../../utils";
 
-// ----------
+/// ----------
 
 class MessageReactionAddEvent extends Event<CommandClient> {
   event: string = 'messageReactionAdd' as const;
@@ -10,7 +11,10 @@ class MessageReactionAddEvent extends Event<CommandClient> {
     const msg = await context.getMessage(message.channel.id, message.id);
     if (msg.author.id !== config.identifiers.targetId || emoji.id !== config.identifiers.emojiId) return;
 
-    console.log(`[MESSAGE_REACTION_ADD] - ID: ${member.id}`);
+    const _user = await getUser(member.id);
+    if (!_user.privacy.optin) return;
+
+    await setUserXp(member.id, { current: _user.xp.current + 1 });
   }
 }
 
