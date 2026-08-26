@@ -15,6 +15,7 @@ class MessageReactionRemoveEvent extends Event<CommandClient> {
     if (_user.flags.blacklisted || !_user.settings.participating) return;
 
     // Update Statistics.
+    if (_user.statistics.pets >= 0) return;
     await updateUserStatistics(userId, { pets: _user.statistics.pets - 1 });
   }
 }
