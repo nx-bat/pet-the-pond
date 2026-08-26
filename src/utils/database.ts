@@ -4,47 +4,42 @@ import { User } from "../types";
 const client = postgres(process.env.DATABASE_URL);
 
 const getDefaultUser = (userId: string): User => ({
-  user_id: userId,
-  privacy: {
-    optin: true,
+  flags: {
+    blacklisted: false
   },
-  xp: {
-    current: 0
+
+  settings: {
+    participating: true,
   },
+
+  statistics: {
+    pets: 0
+  }
 });
 
 export async function getUser(userId: string): Promise<User> {
   let [user] = await client<{ user_id: string; data: User }[]>`
-    SELECT user_id, data
-    FROM users
+    SELECT user_id, data FROM users
     WHERE user_id = ${userId}
   `;
 
-  if (!user) {
-    const defaultUser = getDefaultUser(userId);
+  if (user) return user.data;
 
-    [user] = await client<{ user_id: string; data: User }[]>`
-      INSERT INTO users (user_id, data)
-      VALUES (${userId}, ${client.json(defaultUser)})
-      ON CONFLICT (user_id)
-      DO NOTHING
-      RETURNING user_id, data
-    `;
+  [user] = await client<{ user_id: string; data: User }[]>`
+    INSERT INTO users (user_id, data)
+    VALUES (${userId}, ${client.json(getDefaultUser(userId))})
+    ON CONFLICT (user_id)
+    DO NOTHING
+    RETURNING user_id, data
+  `;
 
-    if (!user) {
-      [user] = await client<{ user_id: string; data: User }[]>`
-        SELECT user_id, data FROM users WHERE user_id = ${userId}
-      `;
-    }
-  }
 
-  return user.data;
 }
 
-export async function setUser(user: User): Promise<void> {
+export async function setUser(userId: string, data: User): Promise<void> {
   await client`
     INSERT INTO users (user_id, data)
-    VALUES (${user.user_id}, ${client.json(user)})
+    VALUES (${userId}, ${client.json(data)})
     ON CONFLICT (user_id)
     DO UPDATE SET data = EXCLUDED.data
   `;
@@ -57,18 +52,38 @@ export async function deleteUser(userId: string): Promise<void> {
   `;
 }
 
-export async function setUserPrivacy(userId: string, privacy: User["privacy"]): Promise<void> {
+export async function updateUserFlags(userId: string, flags: Partial<User["flags"]>): Promise<void> {
   await client`
     UPDATE users
-    SET data = jsonb_set(data, '{privacy}', ${client.json(privacy)})
+    SET data = jsonb_set(
+      data,
+      '{flags}',
+      data->'flags' || ${client.json(flags)}
+    )
     WHERE user_id = ${userId}
   `;
 }
 
-export async function setUserXp(userId: string, xp: User["xp"]): Promise<void> {
+export async function updateUserSettings(userId: string, settings: Partial<User["settings"]>): Promise<void> {
   await client`
     UPDATE users
-    SET data = jsonb_set(data, '{xp}', ${client.json(xp)})
+    SET data = jsonb_set(
+      data,
+      '{settings}',
+      data->'settings' || ${client.json(settings)}
+    )
+    WHERE user_id = ${userId}
+  `;
+}
+
+export async function updateUserStatistics(userId: string, statistics: Partial<User["statistics"]>): Promise<void> {
+  await client`
+    UPDATE users
+    SET data = jsonb_set(
+      data,
+      '{statistics}',
+      data->'statistics' || ${client.json(statistics)}
+    )
     WHERE user_id = ${userId}
   `;
 }
