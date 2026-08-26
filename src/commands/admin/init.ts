@@ -8,6 +8,7 @@ import config from "../../config";
     .setIntegrationTypes(Constants.ApplicationIntegrationType.GuildInstall)
     .setContexts(Constants.InteractionContextType.Guild)
     .setCommandType(Constants.ApplicationCommandType.ChatInput)
+    .setMemberPermission(Constants.PermissionFlagsBits.Administrator)
 )
 class InitCommand extends Command<CommandClient> {
   users = [

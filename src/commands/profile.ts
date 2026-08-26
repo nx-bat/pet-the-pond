@@ -14,19 +14,6 @@ class ProfileCommand extends Command<CommandClient> {
 
   async handleCommand(context: CommandClient<any, any>, interaction: CommandInteraction) {
     await interaction.defer();
-    const _user = await getUser(interaction.user.id);
-
-    // Check if user has been blacklisted.
-    if (_user.flags.blacklisted) {
-      await interaction.createMessage({
-        embeds: [{
-          color: 0xff5555,
-          description: 'There was an error processing your request. Please try again later.'
-        }]
-      });
-
-      return;
-    }
 
     await interaction.createMessage({
       embeds: [{

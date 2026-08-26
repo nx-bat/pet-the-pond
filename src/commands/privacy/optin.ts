@@ -15,7 +15,6 @@ class OptInCommand extends Command<CommandClient> {
   async handleCommand(context: CommandClient<any, any>, interaction: CommandInteraction) {
     await interaction.defer(true);
 
-    const _user = await getUser(interaction.user.id);
     await updateUserSettings(interaction.user.id, { participating: true });
 
     await interaction.createMessage({

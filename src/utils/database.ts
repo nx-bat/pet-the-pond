@@ -50,18 +50,6 @@ export async function deleteUser(userId: string): Promise<void> {
   `;
 }
 
-export async function updateUserFlags(userId: string, flags: Partial<User["flags"]>): Promise<void> {
-  await client`
-    UPDATE users
-    SET data = jsonb_set(
-      data,
-      '{flags}',
-      data->'flags' || ${client.json(flags)}
-    )
-    WHERE user_id = ${userId}
-  `;
-}
-
 export async function updateUserSettings(userId: string, settings: Partial<User["settings"]>): Promise<void> {
   await client`
     UPDATE users
@@ -85,3 +73,24 @@ export async function updateUserStatistics(userId: string, statistics: Partial<U
     WHERE user_id = ${userId}
   `;
 }
+
+//#region Leaderboard
+
+export async function getHighestPets(limit = 10): Promise<{ userId: string, pets: number }[]> {
+  const users = await client<{ user_id: string; pets: number }[]>`
+    SELECT user_id, (data->'statistics'->>'pets')::integer AS pets
+    FROM users
+    WHERE
+      COALESCE((data->'flags'->>'blacklisted')::boolean, false) = false
+      AND COALESCE((data->'settings'->>'participating')::boolean, true) = true
+    ORDER BY pets DESC, user_id ASC
+    LIMIT ${limit}
+  `;
+
+  return users.map(user => ({
+    userId: user.user_id,
+    pets: user.pets
+  }));
+}
+
+//#endregion
