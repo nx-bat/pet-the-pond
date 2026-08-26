@@ -22,7 +22,7 @@ class ProfileCommand extends Command<CommandClient> {
       await interaction.createMessage({
         embeds: [{
           color: 0xff5555,
-          description: 'Sorry, I was unable to get your profile. Please try again later.'
+          description: 'There was an error processing your request. Please try again later.'
         }]
       });
 
