@@ -1,17 +1,12 @@
-// Client.
-import ready from "./client/ready";
-
-// Message.
 import messageReactionAdd from "./message/messageReactionAdd";
 import messageReactionRemove from "./message/messageReactionRemove";
+import ready from "./client/ready";
 
 // ----------
 
 export default [
   // Client.
-  ready,
-
-  // Message.
   messageReactionAdd,
-  messageReactionRemove
+  messageReactionRemove,
+  ready,
 ];
