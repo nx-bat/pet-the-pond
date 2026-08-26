@@ -15,6 +15,8 @@ class ProfileCommand extends Command<CommandClient> {
   async handleCommand(context: CommandClient<any, any>, interaction: CommandInteraction) {
     await interaction.defer();
 
+    const _user = await getUser(interaction.user.id);
+
     await interaction.createMessage({
       embeds: [{
         author: {
