@@ -28,8 +28,8 @@ const client: CommandClient = new CommandClient({
   },
 });
 
-commands.forEach(command => client.registerCommand(command));
-events.forEach(event => client.registerEvent(event));
+commands.forEach(command => client.registerCommand(command, true));
+events.forEach(event => client.registerEvent(event, true));
 
 // ----------
 

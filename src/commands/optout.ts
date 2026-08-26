@@ -1,5 +1,5 @@
 import { Command, CommandBuilder, CommandClient, CommandInteraction, Constants, SlashCommand } from "athena-prime";
-import { setUserPrivacy } from "../utils";
+import { getUser, setUserPrivacy } from "../utils";
 
 @SlashCommand(
   new CommandBuilder('optout', 'Opt out of the Pet the Pond event.')
@@ -11,11 +11,13 @@ class OptOutCommand extends Command<CommandClient> {
   cooldown = 5;
 
   async handleCommand(context: CommandClient<any, any>, interaction: CommandInteraction) {
-    await setUserPrivacy(interaction.member.id, { optin: false });
+    await interaction.defer(true);
+
+    const _user = await getUser(interaction.user.id);
+    await setUserPrivacy(_user.user_id, { optin: false });
 
     await interaction.createMessage({
-      content: "Successfully opted out. Interactions will not be acknowledged.",
-      flags: Constants.MessageFlags.Ephemeral
+      content: "Successfully opted out. You won't receive any points for petting :<"
     });
   }
 }

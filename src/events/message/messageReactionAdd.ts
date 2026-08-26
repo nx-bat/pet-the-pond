@@ -14,7 +14,7 @@ class MessageReactionAddEvent extends Event<CommandClient> {
     const _user = await getUser(member.id);
     if (!_user.privacy.optin) return;
 
-    await setUserXp(member.id, { current: _user.xp.current + 1 });
+    await setUserXp(_user.user_id, { current: _user.xp.current + 1 });
   }
 }
 

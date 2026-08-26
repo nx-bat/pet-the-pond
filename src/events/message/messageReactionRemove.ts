@@ -12,9 +12,9 @@ class MessageReactionRemoveEvent extends Event<CommandClient> {
     if (msg.author.id !== config.identifiers.targetId || emoji.id !== config.identifiers.emojiId) return;
 
     const _user = await getUser(userId);
-    if (!_user.privacy.optin) return;
+    if (!_user.privacy.optin || _user.xp.current <= 0) return;
 
-    await setUserXp(userId, { current: _user.xp.current - 1 });
+    await setUserXp(_user.user_id, { current: _user.xp.current - 1 });
   }
 }
 
