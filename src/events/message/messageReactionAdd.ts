@@ -2,7 +2,7 @@ import { CommandClient, Constants, Event, Member, Message } from "athena-prime";
 import config from '../../config';
 import { getUser, setUserXp } from "../../utils";
 
-/// ----------
+// ----------
 
 class MessageReactionAddEvent extends Event<CommandClient> {
   event: string = 'messageReactionAdd' as const;

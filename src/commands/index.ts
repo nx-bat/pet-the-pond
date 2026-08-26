@@ -1,5 +1,9 @@
-import init from "./init";
-import optin from "./optin";
-import optout from "./optout";
+import init from "./admin/init";
+import remove from "./admin/remove";
+import optin from "./privacy/optin";
+import optout from "./privacy/optout";
+import profile from "./profile";
 
-export default [init, optin, optout];
+// ----------
+
+export default [init, optin, optout, profile, remove];

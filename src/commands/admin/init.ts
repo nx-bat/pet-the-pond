@@ -1,8 +1,10 @@
 import { Command, CommandBuilder, CommandClient, CommandInteraction, Constants, SlashCommand } from "athena-prime";
-import config from "../config";
+import config from "../../config";
+
+// ----------
 
 @SlashCommand(
-  new CommandBuilder('init', 'Event setup command.')
+  new CommandBuilder('init', 'Configure bot & settings.')
     .setIntegrationTypes(Constants.ApplicationIntegrationType.GuildInstall)
     .setContexts(Constants.InteractionContextType.Guild)
     .setCommandType(Constants.ApplicationCommandType.ChatInput)
