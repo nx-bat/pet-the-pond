@@ -10,12 +10,24 @@ import { getUser } from "../utils";
     .setCommandType(Constants.ApplicationCommandType.ChatInput)
 )
 class ProfileCommand extends Command<CommandClient> {
-  cooldown = 5;
+  cooldown = 15;
 
   async handleCommand(context: CommandClient<any, any>, interaction: CommandInteraction) {
     await interaction.defer();
 
     const _user = await getUser(interaction.user.id);
+
+    // Check if user has been blacklisted.
+    if (_user.flags.blacklisted) {
+      await interaction.createMessage({
+        embeds: [{
+          color: 0xff5555,
+          description: 'Sorry, I was unable to get your profile. Please try again later.'
+        }]
+      });
+
+      return;
+    }
 
     await interaction.createMessage({
       embeds: [{
@@ -27,11 +39,11 @@ class ProfileCommand extends Command<CommandClient> {
         color: 0xe77ed1,
 
         // TODO: Add Rankings.
-        title: `Pet the Pond | Your Profile`,
+        title: `Your Profile | Pet the Pond`,
         fields: [
-          { name: 'Points', value: `${_user.xp.current}`, inline: true },
+          { name: 'Pets', value: `${_user.statistics.pets}`, inline: true },
           { name: 'Rank', value: 'N/A', inline: true },
-          { name: 'Participating', value: _user.privacy.optin ? 'Yes' : 'No', inline: false }
+          { name: 'Participating', value: _user.settings.participating ? 'Yes' : 'No', inline: false }
         ],
 
         footer: {
