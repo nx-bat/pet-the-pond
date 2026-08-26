@@ -4,21 +4,22 @@ import { deleteUser } from "../../utils";
 // ----------
 
 @SlashCommand(
-  new CommandBuilder('remove', 'Remove a user from the database.')
+  new CommandBuilder('wipe', 'Wipe a user from the database.')
     .setIntegrationTypes(Constants.ApplicationIntegrationType.GuildInstall)
     .setContexts(Constants.InteractionContextType.Guild)
     .setCommandType(Constants.ApplicationCommandType.ChatInput)
-    .addUserOption('user', 'The user to remove.', true)
+    .addUserOption('user', 'The user to wipe.', true)
 )
-class RemoveCommand extends Command<CommandClient> {
+class WipeCommand extends Command<CommandClient> {
   users = ['1363132678022631428'];
 
   async handleCommand(context: CommandClient<any, any>, interaction: CommandInteraction) {
-    await interaction.defer(true);
+    console.log('tes');
+    const user = interaction.getRequiredUser('user');
+    await deleteUser(user.id);
 
-    await deleteUser(interaction.getRequiredUser('user').id);
-    await interaction.createMessage({ content: `Successfully removed: ${interaction.user.mention} (*${interaction.user.username}*)`});
+    await interaction.createMessage({ content: `Successfully wiped: ${interaction.user.mention} (*${interaction.user.username}*)`});
   }
 }
 
-export default new RemoveCommand('remove');
+export default new WipeCommand('wipe');
