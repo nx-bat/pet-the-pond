@@ -12,7 +12,6 @@ const client: CommandClient = new CommandClient({
   options: {
     intents: [
       Constants.GatewayIntentBits.Guilds,
-      Constants.GatewayIntentBits.GuildMembers,
       Constants.GatewayIntentBits.GuildMessages,
       Constants.GatewayIntentBits.GuildMessageReactions
     ],

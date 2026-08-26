@@ -4,15 +4,18 @@ import config from "../../config";
 // ----------
 
 @SlashCommand(
-  new CommandBuilder('init', 'Configure bot & settings.')
+  new CommandBuilder('init', 'Runs pre-start operations, then starts the bot for operation.')
     .setIntegrationTypes(Constants.ApplicationIntegrationType.GuildInstall)
     .setContexts(Constants.InteractionContextType.Guild)
     .setCommandType(Constants.ApplicationCommandType.ChatInput)
 )
 class InitCommand extends Command<CommandClient> {
-  users = ['1363132678022631428'];
+  users = [
+    '1363132678022631428', // nxbat
+    '454653142500507649' // bitdash
+  ];
 
-  async handleCommand(context: CommandClient<any, any>, interaction: CommandInteraction) {
+  async #createInformationMessage(context: CommandClient<any, any>, interaction: CommandInteraction) {
     await context.createMessage(interaction.channel.id, {
       embed: {
         color: 0xe77ed1,
@@ -37,7 +40,10 @@ class InitCommand extends Command<CommandClient> {
         }
       }
     });
+  }
 
+  async handleCommand(context: CommandClient<any, any>, interaction: CommandInteraction) {
+    for (const handler of [this.#createInformationMessage]) await handler(context, interaction);
     await interaction.createMessage({ content: 'Done.', flags: Constants.MessageFlags.Ephemeral });
   }
 }

@@ -32,8 +32,6 @@ export async function getUser(userId: string): Promise<User> {
     DO NOTHING
     RETURNING user_id, data
   `;
-
-
 }
 
 export async function setUser(userId: string, data: User): Promise<void> {
