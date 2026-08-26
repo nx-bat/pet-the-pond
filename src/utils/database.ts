@@ -93,4 +93,27 @@ export async function getHighestPets(limit = 10): Promise<{ userId: string, pets
   }));
 }
 
+export async function getPetPosition(userId: string): Promise<number | null> {
+  const result = await client<{ position: number }[]>`
+    SELECT position
+    FROM (
+      SELECT
+        user_id,
+        RANK() OVER (ORDER BY pets DESC, user_id ASC) AS position
+      FROM (
+        SELECT
+          user_id,
+          (data->'statistics'->>'pets')::integer AS pets
+        FROM users
+        WHERE
+          COALESCE((data->'flags'->>'blacklisted')::boolean, false) = false
+          AND COALESCE((data->'settings'->>'participating')::boolean, true) = true
+      ) ranked
+    ) ranked_users
+    WHERE user_id = ${userId}
+  `;
+
+  return result[0]?.position ?? null;
+}
+
 //#endregion

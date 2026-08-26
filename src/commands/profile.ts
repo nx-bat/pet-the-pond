@@ -1,5 +1,5 @@
 import { Command, CommandBuilder, CommandClient, CommandInteraction, Constants, SlashCommand } from "athena-prime";
-import { getUser } from "../utils";
+import { getPetPosition, getUser } from "../utils";
 
 // ----------
 
@@ -16,6 +16,7 @@ class ProfileCommand extends Command<CommandClient> {
     await interaction.defer();
 
     const _user = await getUser(interaction.user.id);
+    const position = await getPetPosition(interaction.user.id);
 
     await interaction.createMessage({
       embeds: [{
@@ -26,12 +27,23 @@ class ProfileCommand extends Command<CommandClient> {
 
         color: 0xe77ed1,
 
-        // TODO: Add Rankings.
         title: `Your Profile | Pet the Pond`,
         fields: [
-          { name: 'Pets', value: `${_user.statistics.pets}`, inline: true },
-          { name: 'Rank', value: 'N/A', inline: true },
-          { name: 'Participating', value: _user.settings.participating ? 'Yes' : 'No', inline: false }
+          {
+            name: 'Pets',
+            value: `${_user.statistics.pets}`,
+            inline: true
+          },
+          {
+            name: 'Rank',
+            value: position ? `#${position}` : 'N/A',
+            inline: true
+          },
+          {
+            name: 'Participating',
+            value: _user.settings.participating ? 'Yes' : 'No',
+            inline: false
+          }
         ],
 
         footer: {
