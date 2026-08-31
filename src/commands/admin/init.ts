@@ -1,5 +1,6 @@
 import { Command, CommandBuilder, CommandClient, CommandInteraction, Constants, SlashCommand } from 'athena-prime';
 import config from '../../config';
+import { database } from '../../utils';
 
 // ----------
 
@@ -17,6 +18,8 @@ class InitCommand extends Command<CommandClient> {
   ];
 
   async #createInformationMessage(context: CommandClient<any, any>, interaction: CommandInteraction) {
+    await database.init();
+
     await context.createMessage(interaction.channel.id, {
       embed: {
         color: 0xe77ed1,
