@@ -1,5 +1,5 @@
 import { Command, CommandBuilder, CommandClient, CommandInteraction, Constants, SlashCommand } from 'athena-prime';
-import { getHighestPets } from '../utils';
+import { database } from '../utils';
 
 // ----------
 
@@ -15,7 +15,7 @@ class LeaderboardCommand extends Command<CommandClient> {
   async handleCommand(context: CommandClient<any, any>, interaction: CommandInteraction) {
     await interaction.defer();
 
-    const _data = await getHighestPets();
+    const _data = await database.getHighestPets();
     const description = _data.length
       ? _data
           .map((entry, index) => `**${index + 1}.** <@${entry.userId}> — **${entry.pets.toLocaleString()}** pets!`)

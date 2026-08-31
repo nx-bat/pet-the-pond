@@ -1,5 +1,5 @@
 import { Command, CommandBuilder, CommandClient, CommandInteraction, Constants, SlashCommand } from 'athena-prime';
-import { updateUserSettings } from '../../utils';
+import { database } from '../../utils';
 
 // ----------
 
@@ -15,7 +15,7 @@ class OptInCommand extends Command<CommandClient> {
   async handleCommand(context: CommandClient<any, any>, interaction: CommandInteraction) {
     await interaction.defer(true);
 
-    await updateUserSettings(interaction.user.id, { participating: true });
+    await database.updateUserSettings(interaction.user.id, { participating: true });
 
     await interaction.createMessage({
       content: "Successfully opted in. You'll receive points for your pets!",

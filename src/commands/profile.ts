@@ -1,5 +1,5 @@
 import { Command, CommandBuilder, CommandClient, CommandInteraction, Constants, SlashCommand } from 'athena-prime';
-import { getPetPosition, getUser } from '../utils';
+import { database } from '../utils';
 
 // ----------
 
@@ -15,8 +15,8 @@ class ProfileCommand extends Command<CommandClient> {
   async handleCommand(context: CommandClient<any, any>, interaction: CommandInteraction) {
     await interaction.defer();
 
-    const _user = await getUser(interaction.user.id);
-    const position = await getPetPosition(interaction.user.id);
+    const _user = await database.getUser(interaction.user.id);
+    const position = await database.getPetPosition(interaction.user.id);
 
     await interaction.createMessage({
       embeds: [

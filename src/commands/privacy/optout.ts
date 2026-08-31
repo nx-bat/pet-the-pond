@@ -1,5 +1,5 @@
 import { Command, CommandBuilder, CommandClient, CommandInteraction, Constants, SlashCommand } from 'athena-prime';
-import { updateUserSettings } from '../../utils';
+import { database } from '../../utils';
 
 // ----------
 
@@ -15,7 +15,7 @@ class OptOutCommand extends Command<CommandClient> {
   async handleCommand(context: CommandClient<any, any>, interaction: CommandInteraction) {
     await interaction.defer(true);
 
-    await updateUserSettings(interaction.user.id, { participating: false });
+    await database.updateUserSettings(interaction.user.id, { participating: false });
 
     await interaction.createMessage({
       content: "Successfully opted out. You won't receive any points for petting :<",

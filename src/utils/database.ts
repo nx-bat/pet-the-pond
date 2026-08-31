@@ -3,7 +3,7 @@ import { User } from '../types';
 
 const client = postgres(process.env.DATABASE_URL);
 
-const getDefaultUser = (userId: string): User => ({
+const getDefaultUser = (): User => ({
   settings: {
     participating: true,
   },
@@ -12,6 +12,15 @@ const getDefaultUser = (userId: string): User => ({
     pets: 0,
   },
 });
+
+export async function init(): Promise<void> {
+  await client`
+    CREATE TABLE IF NOT EXISTS users (
+      user_id TEXT PRIMARY KEY,
+      data JSONB NOT NULL
+    )
+  `;
+}
 
 export async function getUser(userId: string): Promise<User> {
   let [user] = await client<{ user_id: string; data: User }[]>`
@@ -23,11 +32,13 @@ export async function getUser(userId: string): Promise<User> {
 
   [user] = await client<{ user_id: string; data: User }[]>`
     INSERT INTO users (user_id, data)
-    VALUES (${userId}, ${client.json(getDefaultUser(userId))})
+    VALUES (${userId}, ${client.json(getDefaultUser())})
     ON CONFLICT (user_id)
     DO NOTHING
     RETURNING user_id, data
   `;
+
+  return user?.data ?? getDefaultUser();
 }
 
 export async function setUser(userId: string, data: User): Promise<void> {

@@ -1,6 +1,6 @@
 import { CommandClient, Constants, Event } from 'athena-prime';
 import config from '../../config';
-import { getUser, updateUserStatistics } from '../../utils';
+import { database } from '../../utils';
 
 // ----------
 
@@ -16,11 +16,11 @@ class MessageReactionRemoveEvent extends Event<CommandClient> {
     const msg = await context.getMessage(message.channel.id, message.id);
     if (msg.author.id !== config.identifiers.targetId || emoji.id !== config.identifiers.emojiId) return;
 
-    const _user = await getUser(userId);
+    const _user = await database.getUser(userId);
     if (!_user.settings.participating) return;
 
     if (_user.statistics.pets >= 0) return;
-    await updateUserStatistics(userId, { pets: _user.statistics.pets - 1 });
+    await database.updateUserStatistics(userId, { pets: _user.statistics.pets - 1 });
   }
 }
 
