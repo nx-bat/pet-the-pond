@@ -1,5 +1,5 @@
 import { Command, CommandBuilder, CommandClient, CommandInteraction, Constants, SlashCommand } from 'athena-prime';
-import { database } from '../utils';
+import database from '../database';
 
 // ----------
 
@@ -10,35 +10,30 @@ import { database } from '../utils';
     .setCommandType(Constants.ApplicationCommandType.ChatInput),
 )
 class LeaderboardCommand extends Command<CommandClient> {
-  cooldown = 15;
-
   async handleCommand(context: CommandClient<any, any>, interaction: CommandInteraction) {
+    if (!interaction.inGuild()) return;
+
     await interaction.defer();
 
-    const _data = await database.getHighestPets();
-    const description = _data.length
-      ? _data
-          .map((entry, index) => `**${index + 1}.** <@${entry.userId}> — **${entry.pets.toLocaleString()}** pets!`)
+    const data = await database.leaderboard.getLeaderboard(interaction.guild.id);
+    const description = data.length
+      ? data
+          .map((entry, index) => `**${index + 1}.** <@${entry.userId}> — **${entry.points}** points!`)
           .join('\n')
-      : 'Nobody has any pets yet!';
+      : 'Nobody has any points yet!';
 
     await interaction.createMessage({
       embeds: [
         {
           author: {
-            name: interaction.user.username,
-            icon_url: interaction.user.avatarURL,
+            name: interaction.member.username,
+            icon_url: interaction.member.avatarURL,
           },
 
           color: 0xe77ed1,
 
-          title: "Pond's Petting Leaderboard",
+          title: `Leaderboard | ${interaction.guild.name}`,
           description: description,
-
-          footer: {
-            text: `Made by nxbat @ Archwing`,
-            icon_url: 'https://femboytrain.ing/nxbat-archwing',
-          },
         },
       ],
     });

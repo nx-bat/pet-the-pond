@@ -1,6 +1,10 @@
-// Used for typing purposes only.
-// There's an expectation that the person setting up the bot isn't a complete idiot.
 declare global {
+  namespace Application {
+    type Configuration = {
+      emoji_id: string;
+    };
+  }
+
   namespace NodeJS {
     interface ProcessEnv {
       DATABASE_URL: string;
@@ -9,4 +13,4 @@ declare global {
   }
 }
 
-export {};
+export { };

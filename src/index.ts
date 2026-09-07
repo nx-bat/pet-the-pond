@@ -2,6 +2,7 @@ import 'dotenv/config';
 
 import { CommandClient, Constants, Guild, Member, Message, NullCollection, User } from 'athena-prime';
 import commands from './commands';
+import database from './database';
 import events from './events';
 
 // ----------
@@ -16,14 +17,7 @@ const client: CommandClient = new CommandClient({
       Constants.GatewayIntentBits.GuildMessageReactions,
     ],
 
-    largeBotOptimizations: true,
-
-    cache: {
-      users: () => new NullCollection(User),
-      members: () => new NullCollection(Member),
-      messages: () => new NullCollection(Message),
-      guilds: () => new NullCollection(Guild),
-    },
+    largeBotOptimizations: true
   },
 });
 
@@ -32,4 +26,5 @@ events.forEach((event) => client.registerEvent(event, true));
 
 // ----------
 
+database.init();
 client.connect();

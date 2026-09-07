@@ -1,9 +1,7 @@
-import init from './admin/init';
 import leaderboard from './leaderboard';
-import optin from './privacy/optin';
-import optout from './privacy/optout';
-import profile from './profile';
+import rank from './rank';
+import settings from './settings';
 
 // ----------
 
-export default [init, leaderboard, optin, optout, profile];
+export default [leaderboard, rank, settings];

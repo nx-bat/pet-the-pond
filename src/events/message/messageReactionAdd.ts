@@ -1,6 +1,5 @@
 import { CommandClient, Constants, Event, Member, Message } from 'athena-prime';
-import config from '../../config';
-import { database } from '../../utils';
+import database from '../../database';
 
 // ----------
 
@@ -8,13 +7,11 @@ class MessageReactionAddEvent extends Event<CommandClient> {
   event: string = 'messageReactionAdd' as const;
 
   async handle(context: CommandClient<any, any>, message: Message, emoji: Constants.APIEmoji, member: Member) {
-    const msg = await context.getMessage(message.channel.id, message.id);
-    if (msg.author.id !== config.identifiers.targetId || emoji.id !== config.identifiers.emojiId) return;
+    const _config = await database.config.getOrCreateConfig(member.guild.id);
+    if (emoji.id !== _config.emoji_id) return;
 
-    const _user = await database.getUser(member.id);
-    if (!_user.settings.participating) return;
-
-    await database.updateUserStatistics(member.id, { pets: _user.statistics.pets + 1 });
+    const _entry = await database.points.getOrCreatePoints(member.guild.id, member.id);
+    await database.points.updatePoints(member.guild.id, member.id, _entry + 1n);
   }
 }
 
