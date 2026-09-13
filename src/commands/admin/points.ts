@@ -53,7 +53,7 @@ class RankCommand extends Command<CommandClient> {
       case 'take':
         await database`
           INSERT INTO points AS p (user_id, guild_id, points)
-            VALUES ${target.id}, ${interaction.guild.id}, 0)
+            VALUES (${target.id}, ${interaction.guild.id}, 0)
           ON CONFLICT (user_id, guild_id)
             DO UPDATE SET points = GREATEST(p.points - ${points}, 0)
         `;

@@ -12,7 +12,7 @@ class MessageReactionRemoveEvent extends Event<CommandClient> {
 
     await database`
       INSERT INTO points AS p (user_id, guild_id, points)
-        VALUES ${_message.author.id}, ${_message.guildID}, 0)
+        VALUES (${_message.author.id}, ${_message.guildID}, 0)
       ON CONFLICT (user_id, guild_id)
         DO UPDATE SET points = GREATEST(p.points - 1, 0)
     `;
