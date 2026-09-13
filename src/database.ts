@@ -6,7 +6,7 @@ const client = postgres(process.env.DATABASE_URL);
 
 async function init() {
   await client`
-    CREATE TABLE IF NOT EXISTS user_points (
+    CREATE TABLE IF NOT EXISTS points (
       user_id TEXT NOT NULL,
       guild_id TEXT NOT NULL,
       points INTEGER NOT NULL DEFAULT 0 CHECK (points >= 0),
@@ -19,7 +19,7 @@ async function init() {
 async function getPoints(id: string, guild_id: string): Promise<number> {
   const [row] = await client`
     SELECT points
-    FROM user_points
+    FROM points
     WHERE user_id = ${id}
       AND guild_id = ${guild_id}
   `;
@@ -29,7 +29,7 @@ async function getPoints(id: string, guild_id: string): Promise<number> {
 
 async function addPoints(id: string, guild_id: string, count: number) {
   await client`
-    INSERT INTO user_points (user_id, guild_id, points)
+    INSERT INTO points (user_id, guild_id, points)
     VALUES (${id}, ${guild_id}, ${count})
     ON CONFLICT (user_id, guild_id)
     DO UPDATE SET points = user_points.points + ${count}
@@ -38,7 +38,7 @@ async function addPoints(id: string, guild_id: string, count: number) {
 
 async function takePoints(id: string, guild_id: string, count: number) {
   await client`
-    INSERT INTO user_points (user_id, guild_id, points)
+    INSERT INTO points (user_id, guild_id, points)
     VALUES (${id}, ${guild_id}, 0)
     ON CONFLICT (user_id, guild_id)
     DO UPDATE SET points = GREATEST(user_points.points - ${count}, 0)
@@ -50,7 +50,7 @@ async function takePoints(id: string, guild_id: string, count: number) {
 async function getLeaderboard(guild_id: string, limit: number = 10): Promise<{ user_id: string; points: number }[]> {
   return await client`
     SELECT user_id, points
-    FROM user_points
+    FROM points
     WHERE guild_id = ${guild_id}
     ORDER BY points DESC, user_id ASC
     LIMIT ${limit}
@@ -64,7 +64,7 @@ async function getLeaderboardPosition(id: string, guild_id: string): Promise<num
       SELECT
         user_id,
         RANK() OVER (ORDER BY points DESC) AS position
-      FROM user_points
+      FROM points
       WHERE guild_id = ${guild_id}
     ) leaderboard
     WHERE user_id = ${id}
