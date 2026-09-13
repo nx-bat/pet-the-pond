@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import { CommandClient, Constants, Guild, Member, Message, NullCollection, User } from 'athena-prime';
+import { CommandClient, Constants } from 'athena-prime';
 import commands from './commands';
 import database from './database';
 import events from './events';
@@ -26,5 +26,5 @@ events.forEach((event) => client.registerEvent(event, true));
 
 // ----------
 
-database.init();
+database.points.init();
 client.connect();

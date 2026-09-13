@@ -12,13 +12,12 @@ import database from '../database';
 class LeaderboardCommand extends Command<CommandClient> {
   async handleCommand(context: CommandClient<any, any>, interaction: CommandInteraction) {
     if (!interaction.inGuild()) return;
-
     await interaction.defer();
 
     const data = await database.leaderboard.getLeaderboard(interaction.guild.id);
     const description = data.length
       ? data
-          .map((entry, index) => `**${index + 1}.** <@${entry.userId}> — **${entry.points}** points!`)
+          .map((entry, index) => `**${index + 1}.** <@${entry.user_id}> — **${entry.points}** points!`)
           .join('\n')
       : 'Nobody has any points yet!';
 

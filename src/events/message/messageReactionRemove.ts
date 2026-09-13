@@ -7,14 +7,11 @@ class MessageReactionRemoveEvent extends Event<CommandClient> {
   event: string = 'messageReactionRemove' as const;
 
   async handle(context: CommandClient<any, any>, message: { id: string; channel: { id: string } }, emoji: Constants.APIEmoji, userId: string) {
-    const _msg = await context.getMessage(message.channel.id, message.id);
-    if (!_msg.guildID) return;
+    const _message = await context.getMessage(message.channel.id, message.id);
+    if (!_message.guildID) return;
 
-    const _config = await database.config.getOrCreateConfig(_msg.guildID);
-    if (emoji.id !== _config.emoji_id) return;
-
-    const _entry = await database.points.getOrCreatePoints(_msg.guildID, userId);
-    await database.points.updatePoints(_msg.guildID, userId, _entry - 1n);
+    if (emoji.id !== "448912932340891670") return;
+    await database.points.takePoints(_message.author.id, _message.guildID, 1);
   }
 }
 

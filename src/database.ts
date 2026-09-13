@@ -1,153 +1,90 @@
-import postgres, { Sql } from 'postgres';
+import postgres from "postgres";
 
 // ----------
 
-const client: Sql<any> = postgres(process.env.DATABASE_URL);
+const client = postgres(process.env.DATABASE_URL);
 
-export async function init(): Promise<void> {
+async function init() {
   await client`
-    CREATE TABLE IF NOT EXISTS guilds (
-    guild_id TEXT PRIMARY KEY,
-    config JSONB NOT NULL default '{}'::jsonb
-  );`
-
-  await client`
-    CREATE TABLE IF NOT EXISTS points (
-      guild_id TEXT NOT NULL,
+    CREATE TABLE IF NOT EXISTS user_points (
       user_id TEXT NOT NULL,
-      points BIGINT NOT NULL DEFAULT 0,
+      guild_id TEXT NOT NULL,
+      points INTEGER NOT NULL DEFAULT 0 CHECK (points >= 0),
 
-      PRIMARY KEY (guild_id, user_id),
-
-      CONSTRAINT fk_points_guild
-        FOREIGN KEY (guild_id)
-        REFERENCES guilds (guild_id)
-        ON DELETE CASCADE
-    );
+      PRIMARY KEY (user_id, guild_id)
+    )
   `;
 }
 
-//#region Configuration
-
-export async function getOrCreateConfig(guildId: string): Promise<Application.Configuration> {
-  const [inserted] = await client<{ config: Application.Configuration }[]>`
-    INSERT INTO guilds (guild_id)
-    VALUES (${guildId})
-    ON CONFLICT (guild_id) DO NOTHING
-    RETURNING config
+async function getPoints(id: string, guild_id: string): Promise<number> {
+  const [row] = await client`
+    SELECT points
+    FROM user_points
+    WHERE user_id = ${id}
+      AND guild_id = ${guild_id}
   `;
 
-  if (inserted) return inserted.config;
-
-  const [row] = await client<{ config: Application.Configuration }[]>`
-    SELECT config FROM guilds
-    WHERE guild_id = ${guildId}
-  `;
-
-  return row.config;
+  return row?.points ?? 0;
 }
 
-export async function updateConfig(guildId: string, config: Application.Configuration): Promise<void> {
+async function addPoints(id: string, guild_id: string, count: number) {
   await client`
-    UPDATE guilds SET config = ${client.json(config)}
-    WHERE guild_id = ${guildId}
+    INSERT INTO user_points (user_id, guild_id, points)
+    VALUES (${id}, ${guild_id}, ${count})
+    ON CONFLICT (user_id, guild_id)
+    DO UPDATE SET points = user_points.points + ${count}
   `;
 }
 
-export async function deleteConfig(guildId: string): Promise<void> {
+async function takePoints(id: string, guild_id: string, count: number) {
   await client`
-    DELETE FROM guilds
-    WHERE guild_id = ${guildId}
+    INSERT INTO user_points (user_id, guild_id, points)
+    VALUES (${id}, ${guild_id}, 0)
+    ON CONFLICT (user_id, guild_id)
+    DO UPDATE SET points = GREATEST(user_points.points - ${count}, 0)
   `;
 }
 
-//#endregion
+// ----------
 
-//#region Points
-
-export async function getOrCreatePoints(guildId: string, userId: string): Promise<bigint> {
-  const [inserted] = await client<{ points: bigint }[]>`
-    INSERT INTO points (guild_id, user_id)
-    VALUES (${guildId}, ${userId})
-    ON CONFLICT (guild_id, user_id) DO NOTHING
-    RETURNING points
-  `;
-
-  if (inserted) return inserted.points;
-
-  const [row] = await client<{ points: bigint }[]>`
-    SELECT points FROM points
-    WHERE guild_id = ${guildId} AND user_id = ${userId}
-  `;
-
-  return row.points;
-}
-
-export async function updatePoints(guildId: string, userId: string, points: bigint): Promise<void> {
-  await client`
-    UPDATE points SET points = ${points}
-    WHERE guild_id = ${guildId} AND user_id = ${userId}
-  `;
-}
-
-export async function deletePoints(guildId: string, userId: string): Promise<void> {
-  await client`
-    DELETE FROM points
-    WHERE guild_id = ${guildId} AND user_id = ${userId}
-  `;
-}
-
-//#endregion
-
-//#region Leaderboard
-
-export async function getLeaderboard(guildId: string, limit: number = 10): Promise<{ userId: string; points: bigint }[]> {
-  return client<{ userId: string; points: bigint }[]>`
-    SELECT user_id AS "userId", points FROM points
-    WHERE guild_id = ${guildId} AND points > 0
+async function getLeaderboard(guild_id: string, limit: number = 10): Promise<{ user_id: string; points: number }[]> {
+  return await client`
+    SELECT user_id, points
+    FROM user_points
+    WHERE guild_id = ${guild_id}
     ORDER BY points DESC, user_id ASC
     LIMIT ${limit}
   `;
 }
 
-export async function getLeaderboardPosition(guildId: string, userId: string): Promise<number | null> {
-  const [row] = await client<{ rank: number | null }[]>`
-    WITH target AS (
-      SELECT points FROM points
-      WHERE guild_id = ${guildId} AND user_id = ${userId}
-    )
-    SELECT CASE WHEN COUNT(target.*) = 0 THEN NULL ELSE COUNT(candidate.*)::int + 1 END AS rank
-    FROM target
-    LEFT JOIN points AS candidate
-      ON candidate.guild_id = ${guildId}
-      AND (
-        candidate.points > target.points
-        OR (candidate.points = target.points AND candidate.user_id < ${userId})
-      )
+async function getLeaderboardPosition(id: string, guild_id: string): Promise<number | null> {
+  const [row] = await client`
+    SELECT position
+    FROM (
+      SELECT
+        user_id,
+        RANK() OVER (ORDER BY points DESC) AS position
+      FROM user_points
+      WHERE guild_id = ${guild_id}
+    ) leaderboard
+    WHERE user_id = ${id}
   `;
 
-  return row.rank;
+  return row?.position ?? null;
 }
 
-//#endregion
+// ----------
 
 export default {
-  init,
-
-  config: {
-    getOrCreateConfig,
-    updateConfig,
-    deleteConfig
-  },
-
   points: {
-    getOrCreatePoints,
-    updatePoints,
-    deletePoints
+    init,
+    getPoints,
+    addPoints,
+    takePoints
   },
 
   leaderboard: {
     getLeaderboard,
-    getLeaderboardPosition,
+    getLeaderboardPosition
   }
-}
+};

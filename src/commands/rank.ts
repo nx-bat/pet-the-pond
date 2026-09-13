@@ -12,11 +12,10 @@ import database from "../database";
 class RankCommand extends Command<CommandClient> {
   async handleCommand(context: CommandClient<any, any>, interaction: CommandInteraction) {
     if (!interaction.inGuild()) return;
-
     await interaction.defer();
 
-    const _points = await database.points.getOrCreatePoints(interaction.guild.id, interaction.member.id);
-    const _rank = await database.leaderboard.getLeaderboardPosition(interaction.guild.id, interaction.member.id);
+    const _points = await database.points.getPoints(interaction.member.id, interaction.guild.id);
+    const _rank = await database.leaderboard.getLeaderboardPosition(interaction.member.id, interaction.guild.id);
 
     await interaction.createMessage({
       embeds: [{
