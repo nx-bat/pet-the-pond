@@ -8,9 +8,8 @@ class MessageReactionRemoveEvent extends Event<CommandClient> {
 
   async handle(context: CommandClient<any, any>, message: { id: string; channel: { id: string } }, emoji: Constants.APIEmoji, userId: string) {
     const _message = await context.getMessage(message.channel.id, message.id);
-    if (!_message.guildID) return;
 
-    if (emoji.id !== "448912932340891670") return;
+    if (!_message.guildID || emoji.id != '1547870117080342548' || userId == _message.author.id) return;
     await database.points.takePoints(_message.author.id, _message.guildID, 1);
   }
 }

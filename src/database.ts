@@ -29,19 +29,19 @@ async function getPoints(id: string, guild_id: string): Promise<number> {
 
 async function addPoints(id: string, guild_id: string, count: number) {
   await client`
-    INSERT INTO points (user_id, guild_id, points)
+    INSERT INTO points AS p (user_id, guild_id, points)
     VALUES (${id}, ${guild_id}, ${count})
     ON CONFLICT (user_id, guild_id)
-    DO UPDATE SET points = user_points.points + ${count}
+    DO UPDATE SET points = p.points + ${count}
   `;
 }
 
 async function takePoints(id: string, guild_id: string, count: number) {
   await client`
-    INSERT INTO points (user_id, guild_id, points)
+    INSERT INTO points AS p (user_id, guild_id, points)
     VALUES (${id}, ${guild_id}, 0)
     ON CONFLICT (user_id, guild_id)
-    DO UPDATE SET points = GREATEST(user_points.points - ${count}, 0)
+    DO UPDATE SET points = GREATEST(p.points - ${count}, 0)
   `;
 }
 
@@ -52,6 +52,7 @@ async function getLeaderboard(guild_id: string, limit: number = 10): Promise<{ u
     SELECT user_id, points
     FROM points
     WHERE guild_id = ${guild_id}
+      AND points > 0
     ORDER BY points DESC, user_id ASC
     LIMIT ${limit}
   `;
@@ -66,6 +67,7 @@ async function getLeaderboardPosition(id: string, guild_id: string): Promise<num
         RANK() OVER (ORDER BY points DESC) AS position
       FROM points
       WHERE guild_id = ${guild_id}
+        AND points > 0
     ) leaderboard
     WHERE user_id = ${id}
   `;
