@@ -8,6 +8,22 @@ class ReadyEvent extends Event<CommandClient> {
   async handle(context: CommandClient<any, any>) {
     await context.deployCommands();
     context.setCustomActivity('Tracking your petting!');
+
+    context.on('error', async (error: string | Error, shard?: number | undefined) => {
+      const _err = error as Error;
+
+      await context.createMessage('1548676420136599624', {
+        embed: {
+          color: 0xff5555,
+
+          fields: [
+            { name: 'Message', value: _err.message, inline: false },
+            { name: 'Cause', value: `${_err.cause ?? 'N/A'}`, inline: false },
+            { name: 'Stack', value: `${_err.stack ?? 'N/A'}`, inline: false }
+          ]
+        }
+      });
+    })
   }
 }
 
