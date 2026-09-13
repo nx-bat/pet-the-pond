@@ -3,6 +3,36 @@ import database from "../database";
 
 // ----------
 
+async function getPoints(id: string, guild_id: string): Promise<number> {
+  const [row] = await database`
+    SELECT points
+    FROM points
+    WHERE user_id = ${id}
+      AND guild_id = ${guild_id}
+  `;
+
+  return row?.points ?? 0;
+}
+
+async function getLeaderboardPosition(id: string, guild_id: string): Promise<number | null> {
+  const [row] = await database`
+    SELECT position
+    FROM (
+      SELECT
+        user_id,
+        RANK() OVER (ORDER BY points DESC) AS position
+      FROM points
+      WHERE guild_id = ${guild_id}
+        AND points > 0
+    ) leaderboard
+    WHERE user_id = ${id}
+  `;
+
+  return row?.position ?? null;
+}
+
+// ----------
+
 @SlashCommand(
   new CommandBuilder('rank', 'See your rank information.')
     .setIntegrationTypes(Constants.ApplicationIntegrationType.GuildInstall)
@@ -14,8 +44,8 @@ class RankCommand extends Command<CommandClient> {
     if (!interaction.inGuild()) return;
     await interaction.defer();
 
-    const _points = await database.points.getPoints(interaction.member.id, interaction.guild.id);
-    const _rank = await database.leaderboard.getLeaderboardPosition(interaction.member.id, interaction.guild.id);
+    const _points = await getPoints(interaction.member.id, interaction.guild.id);
+    const _rank = await getLeaderboardPosition(interaction.member.id, interaction.guild.id);
 
     await interaction.createMessage({
       embeds: [{
@@ -35,5 +65,7 @@ class RankCommand extends Command<CommandClient> {
     });
   }
 }
+
+// ----------
 
 export default new RankCommand('rank');

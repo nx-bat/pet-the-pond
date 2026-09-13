@@ -26,5 +26,16 @@ events.forEach((event) => client.registerEvent(event, true));
 
 // ----------
 
-database.points.init();
+database`
+  CREATE TABLE IF NOT EXISTS points (
+    user_id TEXT NOT NULL,
+    guild_id TEXT NOT NULL,
+    points INTEGER NOT NULL DEFAULT 0 CHECK (points >= 0),
+
+    PRIMARY KEY (user_id, guild_id)
+  )
+`;
+
+// ----------
+
 client.connect();

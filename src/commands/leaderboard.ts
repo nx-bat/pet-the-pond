@@ -3,6 +3,19 @@ import database from '../database';
 
 // ----------
 
+async function getLeaderboard(guild_id: string, limit: number = 10): Promise<{ user_id: string; points: number }[]> {
+  return await database`
+    SELECT user_id, points
+    FROM points
+    WHERE guild_id = ${guild_id}
+      AND points > 0
+    ORDER BY points DESC, user_id ASC
+    LIMIT ${limit}
+  `;
+}
+
+// ----------
+
 @SlashCommand(
   new CommandBuilder('leaderboard', 'Get the petting leaderboard.')
     .setIntegrationTypes(Constants.ApplicationIntegrationType.GuildInstall)
@@ -14,7 +27,7 @@ class LeaderboardCommand extends Command<CommandClient> {
     if (!interaction.inGuild()) return;
     await interaction.defer();
 
-    const data = await database.leaderboard.getLeaderboard(interaction.guild.id);
+    const data = await getLeaderboard(interaction.guild.id);
     const description = data.length
       ? data
           .map((entry, index) => `**${index + 1}.** <@${entry.user_id}> — **${entry.points}** points!`)
@@ -38,5 +51,7 @@ class LeaderboardCommand extends Command<CommandClient> {
     });
   }
 }
+
+// ----------
 
 export default new LeaderboardCommand('leaderboard');

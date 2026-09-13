@@ -8,7 +8,13 @@ class MessageReactionAddEvent extends Event<CommandClient> {
 
   async handle(context: CommandClient<any, any>, message: Message, emoji: Constants.APIEmoji, member: Member) {
     if (!message.guildID || emoji.id != '1547870117080342548' || member.id == message.author.id) return;
-    await database.points.addPoints(message.author.id, member.guild.id, 1);
+
+    await database`
+      INSERT INTO points AS p (user_id, guild_id, points)
+        VALUES (${message.author.id}, ${member.guild.id}, 1)
+      ON CONFLICT (user_id, guild_id)
+        DO UPDATE SET points = p.points + 1
+    `;
   }
 }
 
