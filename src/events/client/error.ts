@@ -3,14 +3,16 @@ import { CommandClient, Event } from 'athena-prime';
 // ----------
 
 class ErrorEvent extends Event<CommandClient> {
-  event: string = 'ready' as const;
+  event: string = 'error' as const;
 
   async handle(context: CommandClient<any, any>, error: string | Error, shard?: number | undefined) {
     const _err = error as Error;
 
-    await context.createMessage('1548676420136599624', {
+    await context.createMessage(process.env.LOGGING_CHANNEL, {
       embed: {
         color: 0xff5555,
+
+        title: 'Error',
 
         fields: [
           { name: 'Message', value: _err.message, inline: false },
